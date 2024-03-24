@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-deploy
+  namespace: sample
+  labels:
+    app: imageapp
+spec:
+   replicas: 4
+  selector:
+    matchLabels:
+      app: imageapp
+  template:
+    metadata:
+      labels:
+        app: imageapp
+    spec:
+      volumes:
+        - name: shared-volume
+          emptyDir: {}
+      initContainers:
+        - name: busybox-con
+          image: busybox
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /testdata
+          command: ["/bin/sh"]
+          args: ["-c", "echo '<html><body bgcolor=Orange><h1><marquee>DevOps</marquee><font color=white>Welcome to Kubernetes-Images</font></h1></body></html>' > /testdata/index.html"]
+      containers:
+        - name: web-con
+          image: nginx
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /usr/share/nginx/html/
+~                                              
